@@ -30,7 +30,7 @@ const char mult = '*';
 const char pl = '+';
 const char mi = '-';
 const char sq[5] = "sqrt";
-const int epsilon = 0.001;
+const double epsilon = 0.001;
 
 const unsigned int number_of_options = 12;
 const unsigned int max_size = 1024;
@@ -116,6 +116,29 @@ int Get_Smallest (int a, int b, int c) {
         return b;
     }
     return c;
+}
+
+int Get_Biggest (int a, int b) {
+    if (a >= b) {
+        return a;
+    }
+    return b;
+}
+
+int Get_Biggest (int a, int b, int c) {
+    if (a >= Get_Smallest (b, c)) {
+        return a;
+    }
+    else if (b >= Get_Smallest (a, c)) {
+        return b;
+    }
+    return c;
+}
+
+int Get_Biggest (int a, int b, int c, int d, int e) {
+    int biggest_from_first_two = Get_Biggest (a, b);
+    int biggest_from_last_three = Get_Biggest (c, d, e);
+    return Get_Biggest (biggest_from_first_two, biggest_from_last_three);
 }
 
 void Put_In_Front_Of_Root (double& num_in_root, double& num_in_front_of_root) {
@@ -503,7 +526,7 @@ void Bisection (double x1, double y1, double x2, double y2, double x3, double y3
 }
 
 void Fill_Point_Of_Interception_Of_A_Line_And_A_Parabola (double a1, double b1, double c1, double a2, double b2, double c2, double& i1, double& i2, double& i3, double& i4, double& i5, double& j1, double& j2, double& j3, double& j4, double& j5, int point) {
-    Fix_Coefficients (a1, b1, c1);
+    //Fix_Coefficients (a1, b1, c1);
     Fix_Coefficients (a2, b2, c2);
     i1 = 0; j1 = 0;
     i2 = 0; j2 = 0;
@@ -726,7 +749,38 @@ void Fill_Coefficients_Of_Lines_Crossing_A_Point_Tanget_To_A_Parabola ( double x
     }
 }
 
+void Reduce_Coefficients (double& t1, double& t2, double& t4, double& t6, double& t7) {
+    if (!Is_An_Int(t1) || !Is_An_Int(t2) || !Is_An_Int(t4) || !Is_An_Int(t6) || !Is_An_Int(t7)) {
+        return;
+    }
+    int f1 = t1;
+    int f2 = t2;
+    int f4 = t4;
+    int f6 = t6;
+    int f7 = t7;
+    int biggest =  Get_Biggest (f1, f2, f4, f6, f7);
+    double sq = sqrt (biggest);
+    for (int i = 2 ; i <= sq ; ) {
+        if (f1 % i == 0 && f2 % i == 0 && f4 % i == 0 && f6 % i == 0 && f7 % i == 0) {
+            f1 /= i;
+            f2 /= i;
+            f4 /= i;
+            f6 /= i;
+            f7 /= i;
+        }
+        else {
+            ++i;
+        }
+    }
+    t1 = f1;
+    t2 = f2;
+    t4 = f4;
+    t6 = f6;
+    t7 = f7;
+}
+
 void Print_Equation_Of_Line_With_Roots (double t1, double t2, double t3, double t4, double t5, double t6, double t7, double t8) {
+    Reduce_Coefficients (t1, t2, t4, t6 ,t7);
     if (Are_Equal (t3, 0) && Are_Equal (t5, 0) && Are_Equal (t8, 0)) {
         Print_Equation_Of_Line (t1, t4, t5);
         return;
